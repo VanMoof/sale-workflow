@@ -90,6 +90,15 @@ class AutomaticWorkflowJob(models.Model):
 
     @api.model
     def _validate_invoices(self):
+        """ Due to risk of Magento amount capture, under no circumstances
+        allow to confirm invoices without our custom criteria. This can occur
+        when the job is run when the customization is not loaded, for instance
+        when a new dependency is added to the custom module which is not yet
+        installed. This results in a partially loaded database in which this
+        code could be run. """
+
+        return
+
         invoice_obj = self.env['account.invoice']
         invoices = invoice_obj.search(
             [('state', 'in', ['draft']),
