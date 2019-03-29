@@ -76,7 +76,8 @@ class TestAutomaticWorkflow(common.TransactionCase):
         self.assertTrue(sale.picking_ids)
         self.assertTrue(sale.invoice_ids)
         invoice = sale.invoice_ids
-        self.assertEqual(invoice.state, 'open')
+        # Due to customizations, invoice is not confirmed
+        self.assertEqual(invoice.state, 'draft')
         picking = sale.picking_ids
         self.progress()
         self.assertEqual(picking.state, 'done')
