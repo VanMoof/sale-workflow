@@ -46,6 +46,7 @@ it: sebastien.beau@akretion.com
 
 import logging
 from contextlib import contextmanager
+import threading
 from openerp import models, api
 
 _logger = logging.getLogger(__name__)
@@ -60,12 +61,13 @@ def commit(cr):
     Warning: using this method, the exceptions are logged then discarded.
     """
     try:
-        yield
+        with cr.savepoint():
+            yield
     except Exception:
-        cr.rollback()
         _logger.exception('Error during an automatic workflow action.')
     else:
-        cr.commit()
+        if not getattr(threading.currentThread(), 'testing', False):
+            cr.commit()
 
 
 class AutomaticWorkflowJob(models.Model):
